@@ -60,6 +60,7 @@ const renderBoard = ()=>{
     
     if(playerRole==="b"){
         boardElement.classList.add("flipped");
+        boardElement.classList.add("flipped.piece");
     }else{
         boardElement.classList.remove("flipped");
     }
