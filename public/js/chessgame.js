@@ -15,7 +15,6 @@ const renderBoard = ()=>{
             squareElement.classList.add("square",
                 (rowIndex+squareindex)%2===0?"light":"dark"
             );
-
             squareElement.dataset.row=rowIndex;
             squareElement.dataset.col=squareindex;
 
@@ -44,15 +43,17 @@ const renderBoard = ()=>{
             }
             squareElement.addEventListener("dragover", function(e){
                 e.preventDefault();
-                if(draggedPiece){
+            });
+            squareElement.addEventListener("drop", function(e){
+                e.preventDefault();
+                if(draggedPiece && sourceSquare){
                     const targetSquare={
                         row: parseInt(squareElement.dataset.row),
                         col: parseInt(squareElement.dataset.col),
                     };
 
-                    handleMove(sourceSquare, targetSquare); 
+                    handleMove(sourceSquare, targetSquare);
                 }
-
             });
             boardElement.appendChild(squareElement);
         });
@@ -63,35 +64,40 @@ const renderBoard = ()=>{
         boardElement.classList.add("flipped.piece");
     }else{
         boardElement.classList.remove("flipped");
+        //boardElement.classList.remove("flipped.piece");
     }
 };
 
 const handleMove = (source,target) => {
     const move = {
         from:String.fromCharCode(97+source.col)+`${8-source.row}`,
-        to:String.fromCharCode(97+target.col)+`${8-target.row}`, 
-        promotion: "q"
+        to:String.fromCharCode(97+target.col)+`${8-target.row}`,
+        //promotion: playerRole==="b"? "p" : "P",
+
     };
     socket.emit("move", move);
 };
 
 const getPieceUnicode = (piece) => {
     const unicodePieces = {
-        
-        p: "♟",
-        r: "♜",
-        n: "♞",
-        b: "♝",
-        q: "♛",
-        k: "♚",
-        P: "♙",
-        R: "♖",
-        N: "♘",
-        B: "♗",
-        Q: "♕",
-        K: "♔" 
+        w: {
+            p: "♙",
+            r: "♖",
+            n: "♘",
+            b: "♗",
+            q: "♕",
+            k: "♔",
+        },
+        b: {
+            p: "♟",
+            r: "♜",
+            n: "♞",
+            b: "♝",
+            q: "♛",
+            k: "♚",
+        },
     };
-    return unicodePieces[piece.type] || "";
+    return unicodePieces[piece.color]?.[piece.type] || "";
 };
 
 socket.on("playerRole", function(role){
